@@ -1,0 +1,233 @@
+.bg-payroll
+{
+  background-image: url('../../src/images/payroll_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100vh; 
+  align-items: center;
+  /* display: flex;
+  justify-content: center; */
+}
+/* @media (max-width: 768px) 
+{
+  .bg-payroll 
+  {
+    background-size: contain;
+  }
+} */
+.modal 
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-main 
+{
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+.sidebar 
+{
+    width: auto;
+    height: auto;
+    background-color: #1f2e41;
+    color: #fff;
+    padding: 10px 10px 10px 10px;
+    position: absolute;
+    top: 0px; 
+    left: 0;
+    bottom: 0;
+    z-index: 1;
+}
+.header 
+{
+    width: 100%;
+    height: auto;
+    background-color: #f0f0f0;
+    padding: 10px 10px 10px 10px;
+    overflow-x: hidden;
+}
+.main 
+{
+    flex: 1;
+}
+.footer 
+{
+    width: 100vw;
+    height: auto;
+    background-color: #1f2e41;
+    color: #fff;
+    text-align: center;
+    align-items: center;
+    font-weight: bold;
+    padding: 20px 20px 20px 20px;
+    position: absolute;
+    bottom: 0;
+    z-index: 1;
+}
+.layout 
+{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}        
+/* From Time CSS */
+.time-slots {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-top: 4px;
+    max-height: 160px;
+    overflow-y: auto;
+    z-index: 100;
+    top: 12%;
+    right: 6%;
+    width: 140px;
+    border-radius: 8px;
+  }
+  /* Style for each individual time slot */
+  .time-slot {
+    cursor: pointer;
+    padding: 8px;
+    margin: 2px 0;
+    border-radius: 4px;
+  }
+  /* Style for the selected time slot */
+  .time-slot:hover {
+    background-color: #f0f0f0;
+  }
+  .sidebar-header 
+  {
+    text-align: center;
+    padding-bottom: 20px;
+    /* padding-bottom: 20px;
+    font-size: 20px; */
+  }
+  .sidebar-header-image
+  {
+    width: 80px;
+    height: 80px;
+  }
+  .sidebar-menu 
+  {
+    list-style: none;
+    padding: 0;
+    color: #ffffff;
+  }
+  .sidebar-menu-item 
+  {
+    padding: 10px;
+    color: #ffffff;
+  }
+  .sidebar-menu-item a 
+  {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  .sidebar-menu-item a:hover 
+  {
+    background-color: #555;
+  }
+  .submenu-items 
+  {
+    /* display: none; */
+    list-style: none;
+    padding-left: 0;
+  }
+  .submenu-items li 
+  {
+    padding: 10px;
+  }
+  /* .sidebar-menu-item.submenu:hover .submenu-items 
+  {
+    display: block;
+  } */
+  .margin-left-for-arrow
+  {
+    margin-left: 10px;
+  }
+.main-content 
+{
+  width: 100vw;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 200px;
+  align-items: center;
+}
+/* Admin Reporting CSS */
+.horizontal-container 
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  justify-content: center;
+}
+.horizontal-box 
+{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  word-wrap: break-word;
+  background-clip: border-box;
+  background-color: #ffffff;
+  border: 0px solid grey;
+  border-radius: 6px;
+  box-shadow: 2px 2px 4px 2px rgba(0, 0, 0, 0.2);
+  color: #000000;
+  height: auto;
+  position: relative;
+  padding: 10px 10px 10px 10px;
+}
+.horizontal-box .col 
+{
+  display: flex;
+  align-items: center;
+}
+.horizontal-box p 
+{
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+.horizontal-box:hover, .horizontal-box:focus, .horizontal-box:active, .horizontal-box:visited
+{
+  border: 2px solid #1f2e41;
+}
+.box_icon 
+{
+  width: auto;
+  height: auto;
+  align-items: center;
+  color: #e135f4;
+}
+.box_icon_one
+{
+  width: auto;
+  height: auto;
+  align-items: center;
+  color: #E91E63;
+}
+.box_icon_two
+{
+  width: auto;
+  height: auto;
+  align-items: center;
+  color: #8BC34A;
+}
