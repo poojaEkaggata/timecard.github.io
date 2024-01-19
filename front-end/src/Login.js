@@ -48,7 +48,7 @@ function Login()
                 }
                 else
                 {
-                    navigate('/login');
+                    navigate('/');
                     Swal.fire('No Admin User Existed! \n Please check your password.');
                 }
             })

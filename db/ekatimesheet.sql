@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 10, 2024 at 09:26 AM
+-- Generation Time: Jan 19, 2024 at 08:30 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -43,7 +43,8 @@ INSERT INTO `activity` (`id`, `name`) VALUES
 (4, 'Loss of Pay'),
 (5, 'Project Work'),
 (6, 'Public Holiday'),
-(7, 'Sick Leave');
+(7, 'Sick Leave'),
+(8, 'activity');
 
 -- --------------------------------------------------------
 
@@ -68,7 +69,11 @@ INSERT INTO `customer` (`id`, `customer_id`, `name`) VALUES
 (4, 4, 'Mate4Tech'),
 (5, 5, 'Milkvilla'),
 (6, 6, 'Joolkart'),
-(7, 7, 'MGD');
+(7, 7, 'MGD'),
+(8, 8, 'new'),
+(9, 9, 'new cust'),
+(10, 10, 'priya'),
+(11, 11, 'newly');
 
 -- --------------------------------------------------------
 
@@ -92,7 +97,8 @@ INSERT INTO `project` (`id`, `customer_id`, `name`) VALUES
 (3, 3, 'Ekaggata Internal Project - IND'),
 (4, 4, 'Mate4Tech - IND'),
 (5, 5, 'Milkvilla - IND'),
-(6, 6, 'Joolkart - IND');
+(6, 6, 'Joolkart - IND'),
+(7, 7, 'project name');
 
 -- --------------------------------------------------------
 
@@ -132,7 +138,8 @@ CREATE TABLE `tags` (
 
 INSERT INTO `tags` (`id`, `name`) VALUES
 (1, 'Work'),
-(2, 'Public Holiday');
+(2, 'Public Holiday'),
+(3, 'tag');
 
 -- --------------------------------------------------------
 
@@ -175,7 +182,8 @@ INSERT INTO `timesheet` (`id`, `user_id`, `fromdate`, `fromtime`, `duration`, `e
 (12, 3, '2024-01-12', '08:00 PM', '01:00:00', '09:00 PM', 'Ekaggata Internal Delivery', '[\"Ekaggata Internal Project - IND\"]', 'Public Holiday', 'd', 'Work', '2024-01-09 11:30:55', '2024-01-09 11:30:55'),
 (13, 3, '2024-01-25', '10:00 PM', '01:00:00', '11:00 PM', 'Dassault', '[\"Dassault\"]', 'Public Holiday', 'desc', 'Work', '2024-01-09 11:31:57', '2024-01-09 11:31:57'),
 (14, 3, '2024-01-30', '08:00 PM', '01:00:00', '09:00 PM', 'Joolkart', '[\"Joolkart - IND\"]', 'Project Work', 'Description', 'Public Holiday', '2024-01-09 11:57:14', '2024-01-09 11:57:14'),
-(15, 3, '2024-01-09', '05:00 PM', '05:00:00', '10:00 PM', 'Milkvilla', '[\"Milkvilla - IND\"]', 'Comp Off', 'desc', 'Work', '2024-01-09 11:57:45', '2024-01-09 11:57:45');
+(15, 3, '2024-01-09', '05:00 PM', '05:00:00', '10:00 PM', 'Milkvilla', '[\"Milkvilla - IND\"]', 'Comp Off', 'desc', 'Work', '2024-01-09 11:57:45', '2024-01-09 11:57:45'),
+(16, 1, '2024-02-21', '01:00 PM', '02:00:00', '03:00 PM', 'Dassault', '[\"Dassault\"]', 'Comp Off', 'd', 'Public Holiday', '2024-01-19 05:49:33', '2024-01-19 05:49:33');
 
 -- --------------------------------------------------------
 
@@ -224,7 +232,7 @@ INSERT INTO `user` (`id`, `user_id`, `name`, `email`, `password`, `title`, `lang
 (17, 17, 'sample user name', 'sun@gmail.com', '$2b$10$j6ZD/aMPayGDaUCMBtl44ef46R.4ohbaVaIuS8WmhzhRYbWp0wVnq', '', '', '', 0, '', '', '', '2024-01-04 04:55:37', '2024-01-04 04:55:37'),
 (18, 18, 'new sample user', 'nsu@gmail.com', '$2b$10$6gmzuE/1ol6QukDln8cCDePpgyJN3a4v7SCEFlYltD2VVyhs89oKK', '', '', '', 0, '', '', '', '2024-01-04 04:57:20', '2024-01-04 04:57:20'),
 (19, 19, 'Pooja Dhamanekar', 'pooja.dhamanekar@ekaggata.com', '$2b$10$1Zyd5yKahWyDfIY.az/6w.ju70xJQ6Dw1x8YweQVq9fxiLFgMLMga', 'Pooja-Developer', 'English', 'Asia/Kolkata', 200195, 'admin', 'Ekaggata Internal Delivery', 'Team Lead', '2024-01-04 09:24:43', '2024-01-04 09:24:43'),
-(20, 20, 'pooja test', 'poojatest@gmail.com', '$2b$10$oiWcl5Hbi/iyZEOFQ5zWGujtoUXzJHWP0w337m9wWA8shX4z68D.O', 'Pooja-Dev', 'English', 'Asia/Kolkata', 200194, 'admin', 'Ekaggata Internal Delivery', 'Team Lead', '2024-01-04 09:56:27', '2024-01-04 09:56:27'),
+(20, 20, 'poojad tests', 'poojadtests@gmail.com', '$2b$10$oiWcl5Hbi/iyZEOFQ5zWGujtoUXzJHWP0w337m9wWA8shX4z68D.O', 'Pooja-Devs-One', 'Spanish', 'America/Chicago', 200196, 'Neha', 'MGD', 'Team Member', '2024-01-12 06:39:42', '2024-01-12 06:39:42'),
 (21, 21, 'prasad test', 'prasadtest@gmail.com', '$2b$10$PlY60VfKL5vnvDdZQOQG1eXYciDR4vRSAod6NnbZiZMwNvPJb8/Rq', '', 'English', 'Asia/Kolkata', 0, '', '', '', '2024-01-04 10:20:15', '2024-01-04 10:20:15');
 
 --
@@ -281,19 +289,19 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -305,13 +313,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `timesheet`
 --
 ALTER TABLE `timesheet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `user`

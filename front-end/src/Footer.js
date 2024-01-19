@@ -1,11 +1,12 @@
 import React from 'react';
 import './css/Custom.css';
 
-const Footer = () => {
+const Footer = () => 
+{
   return (
-    <div className="footer">
-      An Ekaggata Product
-    </div>
+  <div className="footer">
+    An Ekaggata Product By Pooja Dhamanekar @2023-2024
+  </div>
   );
 };
 

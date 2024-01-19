@@ -79,44 +79,48 @@ function AdminReporting()
 
   const loadRelatedComponent = (index) => 
   {
-    //console.log(`Loading component for item with ID: ${index}`);
     setSelectedComponent(index);
+  };
+
+  const goBackToAdminReporting = () => 
+  {
+    setSelectedComponent(null);
   };
 
   return (
     <>
-    {selectedComponent === null ? (
-        <Row className='d-flex justify-content-center ml-auto mr-auto mt-5 horizontal-container'>
-            {reportingTypeData.map((item,index)=> 
-            (
-                <Col className='col col-2 col-lg-2 col-xl-2 col-xxl-2 col-md-2 col-sm-2 col-xs-2 horizontal-box mb-2' key={index} id={index} onClick={()=>loadRelatedComponent(index)}>
-                    <Row>
-                    <Col className='col col-12 col-lg-12 col-xl-12 col-xxl-12 col-md-12 col-sm-12 col-xs-12'>
-                    <Row>
-                        <Col className='col col-3 col-lg-3 col-xl-3 col-xxl-3 col-md-3 col-sm-3 col-xs-3'>
-                            <i className={item.icon}></i>
+        {selectedComponent === null ? (
+            <Row className='d-flex justify-content-center ml-auto mr-auto mt-5 horizontal-container'>
+                {reportingTypeData.map((item,index)=> 
+                (
+                    <Col className='col col-2 col-lg-2 col-xl-2 col-xxl-2 col-md-2 col-sm-2 col-xs-2 horizontal-box mb-2' key={index} id={index} onClick={()=>loadRelatedComponent(index)}>
+                        <Row>
+                        <Col className='col col-12 col-lg-12 col-xl-12 col-xxl-12 col-md-12 col-sm-12 col-xs-12'>
+                        <Row>
+                            <Col className='col col-3 col-lg-3 col-xl-3 col-xxl-3 col-md-3 col-sm-3 col-xs-3'>
+                                <i className={item.icon}></i>
+                            </Col>
+                            <Col className='col col-7 col-lg-7 col-xl-7 col-xxl-7 col-md-7 col-sm-7 col-xs-7'>
+                                <p className='text-align-center align-items-center'>{item.name}</p>
+                            </Col>
+                        </Row>
                         </Col>
-                        <Col className='col col-7 col-lg-7 col-xl-7 col-xxl-7 col-md-7 col-sm-7 col-xs-7'>
-                            <p className='text-align-center align-items-center'>{item.name}</p>
-                        </Col>
-                    </Row>
+                        </Row>
                     </Col>
-                    </Row>
-                </Col>
-            ))}
-        </Row>
-    ) : null }
-    {selectedComponent === 0 && <OneUserWeeklyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 1 && <OneUserMonthlyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 2 && <OneUserYearlyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 3 && <AllUserWeeklyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 4 && <AllUserMonthlyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 5 && <AllUserYearlyView data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 6 && <ProjectDetails data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 7 && <ProjectOverview data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 8 && <MonthlyReport data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 9 && <InactiveProjects data={reportingTypeData[selectedComponent]} />}
-    {selectedComponent === 10 && <ProjectsByMonthActivityUser data={reportingTypeData[selectedComponent]} />}
+                ))}
+            </Row>
+        ) : null }
+        {selectedComponent === 0 && (<OneUserWeeklyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 1 && (<OneUserMonthlyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 2 && (<OneUserYearlyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 3 && (<AllUserWeeklyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 4 && (<AllUserMonthlyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 5 && (<AllUserYearlyView data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 6 && (<ProjectDetails data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 7 && (<ProjectOverview data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 8 && (<MonthlyReport data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 9 && (<InactiveProjects data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
+        {selectedComponent === 10 && (<ProjectsByMonthActivityUser data={reportingTypeData[selectedComponent]} goBackToAdminReporting={goBackToAdminReporting} />) }
     </>
   );
 };

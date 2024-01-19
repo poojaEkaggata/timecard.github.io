@@ -4,6 +4,23 @@ import './css/AdminCSS.css';
 import AdminDashboard from './AdminDashboard.js';
 import AdminReporting from './AdminReporting/AdminReporting.js';
 import AdminCustomers from './AdminCustomers/AdminCustomers.js';
+import AdminProjects from './AdminProjects/AdminProjects.js';
+import AdminActivities from './AdminActivities/AdminActivities.js';
+import AdminTags from './AdminTags/AdminTags.js';
+import AdminUsers from './AdminUsers/AdminUsers.js';
+import AdminRoles from './AdminRoles/AdminRoles.js';
+import AdminTeams from './AdminTeams/AdminTeams.js';
+import AdminPlugins from './AdminPlugins/AdminPlugins.js';
+import AdminSettings from './AdminSettings/AdminSettings.js';
+import AdminMyTimes from './AdminMyTimes/AdminMyTimes.js';
+import AdminWeeklyHours from './AdminWeeklyHours/AdminWeeklyHours.js';
+import AdminCalendar from './AdminCalendar/AdminCalendar.js';
+import AdminExports from './AdminExports/AdminExports.js';
+import AdminAllTimes from './AdminAllTimes/AdminAllTimes.js';
+import AdminWorkingTimes from './AdminWorkingTimes/AdminWorkingTimes.js';
+import AdminCreateInvoice from './AdminCreateInvoice/AdminCreateInvoice.js';
+import AdminInvoiceHistory from './AdminInvoiceHistory/AdminInvoiceHistory.js';
+import AdminInvoiceTemplate from './AdminInvoiceTemplate/AdminInvoiceTemplate.js';
 
 function MainAdmin({ selectedMenuItem, selectedSubMenuItem }) 
 {
@@ -13,7 +30,6 @@ function MainAdmin({ selectedMenuItem, selectedSubMenuItem })
 
   useEffect(() => 
   {
-    //console.log('Selected Menu Item in MainAdmin:', selectedMenuItem);
     if (selectedMenuItem === currentMenu) 
     {
       setMenuKey(prevKey => prevKey + 1); 
@@ -26,7 +42,6 @@ function MainAdmin({ selectedMenuItem, selectedSubMenuItem })
 
   useEffect(() => 
   {
-    //console.log('Selected Sub Menu Item in MainAdmin:', selectedSubMenuItem);
     if (selectedSubMenuItem) 
     {
       setCurrentMenu(null);
@@ -53,41 +68,41 @@ function MainAdmin({ selectedMenuItem, selectedSubMenuItem })
     switch (selectedSubMenuItem) 
     {
       case 'My Times':
-        return <div style={{ textAlign: 'center' }}>My Times Content</div>;
+        return <AdminMyTimes />;
       case 'Weekly Hours':
-        return <div style={{ textAlign: 'center' }}>Weekly Hours Content</div>;
+        return <AdminWeeklyHours />;
       case 'Calendar':
-        return <div style={{ textAlign: 'center' }}>Calendar Content</div>;
+        return <AdminCalendar />;
       case 'Export':
-        return <div style={{ textAlign: 'center' }}>Export Content</div>;
+        return <AdminExports />;
       case 'All Times':
-        return <div style={{ textAlign: 'center' }}>All Times Content</div>;
+        return <AdminAllTimes />;
       case 'Working Times':
-        return <div style={{ textAlign: 'center' }}>Working Times Content</div>;
+        return <AdminWorkingTimes />;
       case 'Create Invoice':
-        return <div style={{ textAlign: 'center' }}>Create Invoice Content</div>;
+        return <AdminCreateInvoice />;
       case 'Invoice History':
-        return <div style={{ textAlign: 'center' }}>Invoice History Content</div>;
+        return <AdminInvoiceHistory />;
       case 'Invoice Template':
-        return <div style={{ textAlign: 'center' }}>Invoice Template Content</div>;
+        return <AdminInvoiceTemplate />;
       case 'Customers':
         return <AdminCustomers />;
       case 'Projects':
-        return <div style={{ textAlign: 'center' }}>Projects Content</div>;
+        return <AdminProjects />;
       case 'Activities':
-        return <div style={{ textAlign: 'center' }}>Activities Content</div>;
+        return <AdminActivities />;
       case 'Tags':
-        return <div style={{ textAlign: 'center' }}>Tags Content</div>;
+        return <AdminTags />;
       case 'Users':
-        return <div style={{ textAlign: 'center' }}>Users Content</div>;
+        return <AdminUsers />;
       case 'Roles':
-        return <div style={{ textAlign: 'center' }}>Roles Content</div>;
+        return <AdminRoles />;
       case 'Teams':
-        return <div style={{ textAlign: 'center' }}>Teams Content</div>;
+        return <AdminTeams />;
       case 'Plugins':
-        return <div style={{ textAlign: 'center' }}>Plugins Content</div>;
+        return <AdminPlugins />;
       case 'Settings':
-        return <div style={{ textAlign: 'center' }}>Settings Content</div>;
+        return <AdminSettings />;
       default:
         return <AdminDashboard />;
     }

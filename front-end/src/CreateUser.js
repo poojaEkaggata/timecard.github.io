@@ -174,6 +174,7 @@ function MyVerticallyCenteredModal(props)
       };
       fetchSupervisor();
   },[]);
+
   const[selectedSupervisor, setSelectedSupervisor] = useState('');
 
   const[team,setTeam]=useState([]);
@@ -204,6 +205,7 @@ function MyVerticallyCenteredModal(props)
       };
       fetchTeam();
   },[]);
+  
   const[selectedTeam, setSelectedTeam] = useState('');
 
   const[role,setRole]=useState([]);
@@ -234,6 +236,7 @@ function MyVerticallyCenteredModal(props)
       };
       fetchRole();
   },[]);
+
   const[selectedRole, setSelectedRole] = useState('');
 
   function handleEmployeeSubmit(event)
@@ -333,7 +336,7 @@ function MyVerticallyCenteredModal(props)
           </Row>
           <Row className="mb-3 d-flex justify-content-center ml-auto mr-auto p-0">
             <Col className="col-6 col-lg-6 col-xl-6 col-xxl-6 col-md-6 col-sm-6 col-xs-6">
-              <input type="text" className="form-control rounded-0" placeholder="Enter Staff Number" name="staff_number" onChange={handleInput} maxLength={7} pattern="\d{0,9}" onKeyPress={handleKeyPress} />
+              <input type="text" className="form-control rounded-0" placeholder="Enter Employee Number" name="staff_number" onChange={handleInput} maxLength={7} pattern="\d{0,9}" onKeyPress={handleKeyPress} />
             </Col>
             <Col className="col-6 col-lg-6 col-xl-6 col-xxl-6 col-md-6 col-sm-6 col-xs-6">
               <select className="form-select form-select-md rounded-0" aria-label="Default select example" id="supervisor" name="supervisor" onChange={handleInput}>
@@ -342,7 +345,7 @@ function MyVerticallyCenteredModal(props)
                   loading 
                   ? 
                   ( 
-                    <option value="">No Customer Available</option>
+                    <option value="">No Supervisor Available</option>
                   ) 
                   : 
                   (
@@ -406,11 +409,10 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
     }
     const [modalShow, setModalShow] = useState(false);
 
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [userData, setUserData] = useState('');
-    //const [userId, setUserId] = useState('');
+    /* const [loggedIn, setLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(''); */
 
-    useEffect(() => 
+    /* useEffect(() => 
     {
       axios.get('http://localhost:8081/home/userinfo').then((response) => 
         {
@@ -434,9 +436,9 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
           setUserData('');
           //setUserId();
         });
-    },[]);
+    },[]); */
 
-    localStorage.setItem('loggedInUsername', userData.name);
+    /* localStorage.setItem('loggedInUsername', userData.name);
     useEffect(() => 
     {
       const storedUsername = localStorage.getItem('loggedInUsername');
@@ -450,7 +452,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
         setUserData('');
         setLoggedIn(false);
       }
-    }, []);
+    }, []); */
 
   //Open & Close Create Time Sheet Modal UI Functionality
   const[show,setShow]=useState(false);
@@ -869,20 +871,20 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
               )}
             </div>
             <div className="col col-6 col-lg-6 col-md-6 col-sm-6 col-xl-6 col-xxl-6 col-xs-6" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {loggedIn ? 
+                {/* {loggedIn ? 
                 (
-                  <>
+                  <> */}
                     {/* <p> className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}Welcome, {userData}</p> */}
                     <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, Admin</p>
-                  </>
+                  {/* </>
                 ) 
                 : 
                 (
-                  <>
+                  <> */}
                     {/* <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, {userData}</p> */}
-                    <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, Admin</p>
+                    {/* <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, Admin</p>
                   </>
-                )}
+                )} */}
                 <button className="btn btn-primary w-20 fw-bold text-center align-items-center mb-0" style={{ marginLeft: '20px', marginRight: '20px' }} onClick={handleShow} title='Click Here to Create Time Card'>
                   <FontAwesomeIcon icon={faPlus} /> Create Time Card
                 </button>
@@ -909,7 +911,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                                 required
                               />
                               <select 
-                                className="form-control me-0"
+                                className="form-select form-select-md rounded-0 me-0"
                                 style={{ width: '100%' }}
                                 id="fromtime"
                                 name="fromtime"
@@ -944,7 +946,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                                 onChange={(e)=>setDuration(e.target.value)}
                               />
                               <select 
-                                className="form-control me-0"
+                                className="form-select form-select-md rounded-0 me-0"
                                 style={{ width: '100%' }}
                                 id="endtime"
                                 name="endtime"
@@ -966,7 +968,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                               <label htmlFor="message" className="form-label me-2" style={{ width: '100%' }}>
                                 Customer
                               </label>
-                              <select type="dropdown" className='form-control me-0' id="customer" name="customer" style={{ width: '100vw' }} value={selectedCustomerId} onChange={handleFirstSelectChange}> 
+                              <select className='form-select form-select-md rounded-0 me-0' id="customer" name="customer" style={{ width: '100vw' }} value={selectedCustomerId} onChange={handleFirstSelectChange}> 
                                 <option value="">Please Select Customer</option>
                                 {
                                   loading 
@@ -987,7 +989,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                               <label htmlFor="projects" className="form-label me-2" style={{ width: '100%' }}>
                                 Project <span style={{ color: 'red' }}>*</span>
                               </label>
-                              <select type="dropdown" className="form-control me-0" id="projects" name="projects" style={{ width: '100vw' }} required
+                              <select className="form-select form-select-md rounded-0 me-0" id="projects" name="projects" style={{ width: '100vw' }} required
                               //onChange={handleSecondSelectChange} 
                               >
                                 {
@@ -1015,7 +1017,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                               <label htmlFor="activities" className="form-label me-2" style={{ width: '100%' }}>
                                 Activity <span style={{ color: 'red' }}>*</span>
                               </label>
-                              <select className='form-control me-0' id="activities" name="activities" style={{ width: '100vw' }} required onChange={handleThirdSelectChange}>
+                              <select className='form-select form-select-md rounded-0 me-0' id="activities" name="activities" style={{ width: '100vw' }} required onChange={handleThirdSelectChange}>
                                 <option value="">Please Select Activity</option>
                                 {
                                   showActivitySelect 
@@ -1050,7 +1052,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                               <label htmlFor="tag" className="form-label me-2" style={{ width: '100%' }}>
                                 Tags
                               </label>
-                              <select type="dropdown" className="form-control me-0" id="tag" name="tag" style={{ width: '100vw' }} onChange={handleFourthSelectChange}>
+                              <select className="form-select form-select-md rounded-0 me-0" id="tag" name="tag" style={{ width: '100vw' }} onChange={handleFourthSelectChange}>
                                 <option value="">Please Select Tag</option>
                                 {
                                   showTagSelect 

@@ -7,8 +7,7 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import memorystore  from "memorystore";
 import passport from "passport";
-//const express = require("express");
-//const MemoryStore = require('memorystore')(session);
+import exceljs from 'exceljs';
 
 const app = express();
 
@@ -37,7 +36,6 @@ app.use(session({
     secure: false,
     httpOnly: true,
   }
-  //saveUninitialized: false,
   //cookie: { expires: 60 * 60 * 24 }
 }));
 
@@ -45,33 +43,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const db = mysql.createConnection({host:"localhost",user:"root",password:"",database:"ekatimesheet"});
-
-/* app.post('/login', (req, res) => 
-{
-  const sql = "select * from user where `email`=? and `password`=?";
-  db.query(sql,[req.body.email,req.body.password],(err,data)=>
-  {
-    if(err)
-    {
-      return res.json("Error");
-    }
-    if(data.length>0)
-    {
-      if(err)
-      {
-        return res.json("Password Compare Error");
-      }
-      else
-      {
-        return res.json("Success");
-      }
-    }
-    else
-    {
-      return res.json("Failed");
-    }
-  });
-}); */
 
 app.get('/login', (req, res) => 
 {
@@ -92,7 +63,6 @@ app.post('/login', (req, res) =>
   {
     if(err) 
     {
-      //console.error('Database query error:', err);
       return res.status(500).json({ message: 'Error retrieving user' });
     }
     if(results.length === 0) 
@@ -108,15 +78,11 @@ app.post('/login', (req, res) =>
         if(response)
         {
           req.session.user = results;
-          //console.log(req.session.user);
-          //console.log('Login successful');
           const userEmail = results[0].email;
-          //res.send(results);
           return res.status(200).json({ message: 'Login successful', user: { email: userEmail } });
         }
         else
         {
-          //console.log('Passwords do not match.');
           return res.status(401).json({ message: 'Incorrect password' });
         }
       });
@@ -130,7 +96,7 @@ app.post('/login', (req, res) =>
 
 app.get('/home/userinfo', (req, res) => 
 {
-  if (req.session && req.session.user) 
+  if(req.session && req.session.user) 
   {
     console.log("Log in true");
     console.log(req.session.user);
@@ -143,22 +109,6 @@ app.get('/home/userinfo', (req, res) =>
     res.send({ loggedIn: false });
   }
 });
-
-/* app.use(passport.initialize());
-app.use(passport.session());
-
-app.get('/home/userid', (req, res) => 
-{
-  if (req.isAuthenticated()) 
-  {
-    const userId = req.user.id;
-    res.json({ userId });
-  } 
-  else 
-  {
-    res.status(401).json({ message: 'Unauthorized' });
-  }
-}); */
 
 app.post('/home/user',(req,res)=> 
 {
@@ -208,38 +158,8 @@ app.post('/home/customer',(req,res)=>
   })
 });
 
-app.get('/home/customer/customer_id', (req, res) => 
-{
-  const sql="select * from customer";
-  db.query(sql,(err,result)=>
-  {
-    if(err)
-    {
-      return res.json({Error:"Get Customer Error!"});
-    }
-    else
-    {
-      return res.json({Status:"Succcess in getting customer.",Result:result});
-    }
-  })
-});
-
 app.post('/home/customer/add_new_customer',(req,res)=>
 {
-  /* const{name}=req.body;
-  const sql='insert into customer(name)values(?)';
-  db.query(sql,[name],(err,result)=> 
-  {
-    if(err) 
-    {
-      console.log(err);
-      res.status(500).json({error:'Error Saving Data'});
-    } 
-    else 
-    {
-      res.status(200).json({message:'Customer Saved Successfully.'});
-    }
-  }); */
   const{name}=req.body;
   const insertCustomerSql="insert into customer (name) values (?)";
   const values=[name];
@@ -264,6 +184,134 @@ app.post('/home/customer/add_new_customer',(req,res)=>
       }
     });
   });
+});
+
+app.post('/home/get_project',(req,res)=> 
+{
+  const sql="select * from project";
+  db.query(sql,(err,result)=>
+  {
+    if(err)
+    {
+      return res.json({Error:"Get Project Error!"});
+    }
+    else
+    {
+      return res.json({Status:"Succcess in getting project.",Result:result});
+    }
+  })
+});
+
+app.post('/home/project/add_new_project',(req,res)=>
+{
+  const{name}=req.body;
+  const insertCustomerSql="insert into project (name) values (?)";
+  const values=[name];
+  db.query(insertCustomerSql,values,(err,result)=> 
+  {
+    if(err) 
+    {
+      return res.json({error:"Error inserting project"});
+    }
+    const newCustomerId=result.insertId;
+    const updateCustomerIdSql="update project set project_id=? where id=?";
+    const updateValues=[newCustomerId,newCustomerId];
+    db.query(updateCustomerIdSql,updateValues,(updateErr,updateResult)=> 
+    {
+      if(updateErr) 
+      {
+        return res.json({error:"Error updating project_id!"});
+      }
+      else
+      {
+        return res.json({message:"Project created successfully."});
+      }
+    });
+  });
+});
+
+app.post('/home/get_activity',(req,res)=> 
+{
+  const sql="select * from activity";
+  db.query(sql,(err,result)=>
+  {
+    if(err)
+    {
+      return res.json({Error:"Get Activity Error!"});
+    }
+    else
+    {
+      return res.json({Status:"Succcess in getting activity.",Result:result});
+    }
+  })
+});
+
+app.post('/home/activity/add_new_activity',(req,res)=>
+{
+  const{name}=req.body;
+  const insertCustomerSql="insert into activity (name) values (?)";
+  const values=[name];
+  db.query(insertCustomerSql,values,(err,result)=> 
+  {
+    if(err) 
+    {
+      return res.json({error:"Error inserting activity"});
+    }
+    else
+    {
+      return res.json({message:"Activity created successfully."});
+    }
+  });
+});
+
+app.post('/home/get_tag',(req,res)=> 
+{
+  const sql="select * from tags";
+  db.query(sql,(err,result)=>
+  {
+    if(err)
+    {
+      return res.json({Error:"Get Tag Error!"});
+    }
+    else
+    {
+      return res.json({Status:"Succcess in getting tag.",Result:result});
+    }
+  })
+});
+
+app.post('/home/tag/add_new_tag',(req,res)=>
+{
+  const{name}=req.body;
+  const insertCustomerSql="insert into tags (name) values (?)";
+  const values=[name];
+  db.query(insertCustomerSql,values,(err,result)=> 
+  {
+    if(err) 
+    {
+      return res.json({error:"Error inserting tag"});
+    }
+    else
+    {
+      return res.json({message:"Tag created successfully."});
+    }
+  });
+});
+
+app.post('/home/get_all_users',(req,res)=> 
+{
+  const sql="select * from user";
+  db.query(sql,(err,result)=>
+  {
+    if(err)
+    {
+      return res.json({Error:"Get User Error!"});
+    }
+    else
+    {
+      return res.json({Status:"Succcess in getting user.",Result:result});
+    }
+  })
 });
 
 app.post('/home/role',(req,res)=> 
@@ -345,7 +393,6 @@ app.post('/home/project',(req,res)=>
     {
       if(err) 
       {
-        //console.error('Error fetching projects from database:',err);
         res.status(500).json({error:'Error fetching projects'});
         return;
       }
@@ -367,7 +414,6 @@ app.post('/home/activity',(req,res)=>
     {
       if(err) 
       {
-        //console.error('Error fetching activities from database:',err);
         res.status(500).json({error:'Error fetching activities'});
         return;
       }
@@ -416,20 +462,121 @@ app.post('/home/timesheet',(req,res)=>
     });
 });
 
+app.post('/home/update_user', (req, res) => 
+{
+  const { id, name, email, title, language, timezone, staff_number, supervisor, team, role } = req.body;
+  const sql = 'UPDATE user SET name = ?, email = ?, title = ?, language = ?, timezone = ?,  staff_number = ?, supervisor = ?, team = ?, role = ? WHERE id = ?';
+  db.query(sql, [name, email, title, language, timezone, staff_number, supervisor, team, role, id], (err, result) => 
+  {
+    if (err)
+    {
+      console.error('Error updating user:', err);
+      res.status(500).json({ error: 'Error updating user details' });
+      return;
+    }
+    else
+    {
+      console.log('User updated successfully');
+      res.status(200).json({ message: 'User updated successfully' });
+    }
+  });
+});
+
+const createExcelFile = async (records) => 
+{
+  const workbook = new exceljs.Workbook();
+  const worksheet = workbook.addWorksheet('User-Timesheet-Data-1');
+  worksheet.addRow(['From Date','From Time','Duration','End Time','Customer','Projects','Activities','Description','Tag']);
+  records.forEach((record) => 
+  {
+    worksheet.addRow([record.fromdate,record.fromtime,record.duration,record.endtime,record.customer,record.projects,record.activity,record.description,record.tag]);
+  });
+  worksheet.getColumn(1).width = 15;
+  worksheet.getColumn(2).width = 15;
+  worksheet.getColumn(3).width = 15;
+  worksheet.getColumn(4).width = 15;
+  worksheet.getColumn(5).width = 30;
+  worksheet.getColumn(6).width = 30;
+  worksheet.getColumn(7).width = 15;
+  worksheet.getColumn(8).width = 15;
+  worksheet.getColumn(9).width = 15;
+  const buffer = await workbook.xlsx.writeBuffer();
+  return buffer;
+};
+
+const fetchUserTimesheetRecords = (userId, selectedYear, selectedMonth) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    // Construct the start and end date for the selected month
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+
+    // Format the dates to match your database date format
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    {
+      if (error) 
+      {
+        console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/:userId/records', async (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const selectedYear = req.query.year;
+    const selectedMonth = req.query.month;
+    const records = await fetchUserTimesheetRecords(userId,selectedYear,selectedMonth);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
 app.post('/user_home/customer',(req,res)=> 
 {
-    const sql="select * from customer";
-    db.query(sql,(err,result)=>
+  const sql="select * from customer";
+  db.query(sql,(err,result)=>
+  {
+    if(err)
     {
-        if(err)
-        {
-            return res.json({Error:"Get Customer Error!"});
-        }
-        else
-        {
-            return res.json({Status:"Succcess in getting customer.",Result:result});
-        }
-    })
+      return res.json({Error:"Get Customer Error!"});
+    }
+    else
+    {
+      return res.json({Status:"Succcess in getting customer.",Result:result});
+    }
+  })
 });
 
 app.post('/user_home/project',(req,res)=> 
@@ -440,7 +587,6 @@ app.post('/user_home/project',(req,res)=>
     {
       if(err) 
       {
-        //console.error('Error fetching projects from database:',err);
         res.status(500).json({error:'Error fetching projects'});
         return;
       }
@@ -462,7 +608,6 @@ app.post('/user_home/activity',(req,res)=>
     {
       if(err) 
       {
-        //console.error('Error fetching activities from database:',err);
         res.status(500).json({error:'Error fetching activities'});
         return;
       }
@@ -493,13 +638,6 @@ app.post('/user_home/tag',(req,res)=>
     })
 });
 
-/* app.post('/login', passport.authenticate('local', 
-{
-  successRedirect: '/user_home',
-  failureRedirect: '/', 
-  failureFlash: true
-})); */
-
 app.get('/user_home/userinfo', (req, res) => 
 {
   if (req.session && req.session.user) 
@@ -518,15 +656,6 @@ app.get('/user_home/userinfo', (req, res) =>
 
 app.get('/user_home/userid', (req, res) => 
 {
-  /* if (req.isAuthenticated()) 
-  {
-    const userId = req.user.id;
-    res.json({ userId });
-  } 
-  else 
-  {
-    res.status(401).json({ message: 'Unauthorized' });
-  } */
   if (req.session && req.session.user) 
   {
     const userId = req.session.user[0].user_id;
@@ -559,7 +688,39 @@ app.post('/user_home/timesheet',(req,res)=>
     });
 });
 
+app.get('/home/userstatus', (req, res) => 
+{
+  if (req.session && req.session.user) 
+  {
+    //console.log("Log in true");
+    res.send({ loggedIn: true });
+  } 
+  else 
+  {
+    //console.log("Log in false");
+    res.send({ loggedIn: false });
+  }
+});
+
+app.get('/home/timesheet_data', (req, res) => 
+{
+  const user_id = 1;
+  const query = `SELECT duration FROM timesheet WHERE user_id = ?`;
+  db.query(query, [user_id], (err, duration) => 
+  {
+    if (err) 
+    {
+      console.error('Error fetching timesheet data:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } 
+    else 
+    {
+      res.json(duration);
+    }
+  });
+});
+
 app.listen(8081,()=>
 {
-  console.log("server is running");
+  console.log("server is running on port http://localhost:8081");
 });

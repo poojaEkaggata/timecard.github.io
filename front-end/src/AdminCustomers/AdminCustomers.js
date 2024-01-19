@@ -158,8 +158,8 @@ const styles =
     table: 
     {
         width: '100%',
-        height: '500px',
-        border: '1px solid #ddd'
+        height: '500px'
+        /* border: '1px solid #ddd' */
         /* borderCollapse: 'collapse', */
         /* tableLayout: 'fixed' */
     },
