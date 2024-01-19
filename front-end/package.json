@@ -1,5 +1,6 @@
 {
   "name": "front-end",
+  "homepage": "https://timesheet.ekaway.com/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
