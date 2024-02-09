@@ -8,8 +8,21 @@ import session from "express-session";
 import memorystore  from "memorystore";
 import passport from "passport";
 import exceljs from 'exceljs';
+//import http from 'http';
+//import { Server } from 'socket.io';
 
 const app = express();
+
+//const server = http.createServer(app);
+//const io = new Server(server);
+
+// io.on('connection', (socket) => 
+// {
+//   console.log('Admin connected');
+//   socket.on('disconnect', () => {
+//     console.log('Admin disconnected');
+//   });
+// });
 
 const MemoryStore = memorystore(session);
 
@@ -27,7 +40,7 @@ app.use(bodyParser.json());
 app.use(session({
   key: "userId",
   secret: "subscribe",
-  resave: true,
+  resave: false,
   saveUninitialized: true,
   store: new MemoryStore({checkPeriod:86400000}),
   cookie: 
@@ -42,13 +55,39 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+/* passport.serializeUser((user, done) => 
+{
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => 
+{
+  User.findById(id, (err, user) => {
+      done(err, user);
+  });
+}); */
+
 const db = mysql.createConnection({host:"localhost",user:"root",password:"",database:"ekatimesheet"});
+
+db.connect((err) => 
+{
+  if (err) 
+  {
+    console.error('Error connecting to the database:', err);
+    process.exit(1);
+  } 
+  else 
+  {
+    console.log('Your Ekatimesheet DB Connected Successfully');
+  }
+});
 
 app.get('/login', (req, res) => 
 {
+  const userId = req.session.userId;
   if(req.session.user)
   {
-    res.send({loggedIn: true,user: req.session.user});
+    res.send({loggedIn: true,user: req.session.user,userId});
   }
   else
   {
@@ -79,7 +118,8 @@ app.post('/login', (req, res) =>
         {
           req.session.user = results;
           const userEmail = results[0].email;
-          return res.status(200).json({ message: 'Login successful', user: { email: userEmail } });
+          const userId = results[0].user_id;
+          return res.status(200).json({ message: 'Login successful', user: { email: userEmail, user_id: userId }, userEmail, userId });
         }
         else
         {
@@ -98,14 +138,10 @@ app.get('/home/userinfo', (req, res) =>
 {
   if(req.session && req.session.user) 
   {
-    console.log("Log in true");
-    console.log(req.session.user);
     res.send({ loggedIn: true, user: req.session.user });
   } 
   else 
   {
-    console.log("Log in false");
-    console.log(req.session.user);
     res.send({ loggedIn: false });
   }
 });
@@ -452,7 +488,6 @@ app.post('/home/timesheet',(req,res)=>
     {
       if(err) 
       {
-        console.log(err);
         res.status(500).json({error:'Error Saving Data'});
       } 
       else 
@@ -470,13 +505,11 @@ app.post('/home/update_user', (req, res) =>
   {
     if (err)
     {
-      console.error('Error updating user:', err);
       res.status(500).json({ error: 'Error updating user details' });
       return;
     }
     else
     {
-      console.log('User updated successfully');
       res.status(200).json({ message: 'User updated successfully' });
     }
   });
@@ -504,7 +537,7 @@ const createExcelFile = async (records) =>
   return buffer;
 };
 
-const fetchUserTimesheetRecords = (userId, selectedYear, selectedMonth) => 
+const fetchUserTimesheetRecords = (userId, selectedYear, selectedMonth, selectedWeek) => 
 {
   return new Promise((resolve, reject) => 
   {
@@ -515,13 +548,33 @@ const fetchUserTimesheetRecords = (userId, selectedYear, selectedMonth) =>
     // Format the dates to match your database date format
     const formattedStartDate = startDate.toISOString().split('T')[0];
     const formattedEndDate = endDate.toISOString().split('T')[0];
+
+    const startOfWeek = new Date(startDate);
+    startOfWeek.setDate(startOfWeek.getDate() + (selectedWeek - 1) * 7);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+    const formattedStartOfWeek = startOfWeek.toISOString().split('T')[0];
+    const formattedEndOfWeek = endOfWeek.toISOString().split('T')[0];
   
     const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
-    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+
+    const weekCondition = ' AND fromdate >= ? AND fromdate <= ?';
+    
+    const fullQuery = selectedWeek
+      ? query + weekCondition
+      : query;
+
+    const queryParameters = selectedWeek
+      ? [userId, formattedStartDate, formattedEndDate, formattedStartOfWeek, formattedEndOfWeek]
+      : [userId, formattedStartDate, formattedEndDate];
+
+    //db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    db.query(fullQuery, queryParameters, (error, result) =>
     {
       if (error) 
       {
-        console.error('Error fetching user timesheet records:', error);
+        //console.error('Error fetching user timesheet records:', error);
         reject(error);
       } 
       else 
@@ -550,7 +603,8 @@ app.get('/home/user/:userId/records', async (req, res) =>
     const userId = req.params.userId;
     const selectedYear = req.query.year;
     const selectedMonth = req.query.month;
-    const records = await fetchUserTimesheetRecords(userId,selectedYear,selectedMonth);
+    const selectedWeek = req.query.week;
+    const records = await fetchUserTimesheetRecords(userId,selectedYear,selectedMonth,selectedWeek);
     const excelData = await createExcelFile(records);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
@@ -558,7 +612,298 @@ app.get('/home/user/:userId/records', async (req, res) =>
   } 
   catch(error) 
   {
-    console.error('Error fetching or processing user records:', error);
+    //console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
+const fetchUserMonthlyTimesheetRecordsForOneUser = (userId,selectedYear,selectedMonth) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+
+    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    {
+      if (error) 
+      {
+        //console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/:userId/one_user_monthly_records', async (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const selectedYear = req.query.year;
+    const selectedMonth = req.query.month;
+    const records = await fetchUserMonthlyTimesheetRecordsForOneUser(userId,selectedYear,selectedMonth);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    //console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
+const fetchUserYearlyTimesheetRecords = (userId, selectedYear) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    // Construct the start and end date for the selected year
+    const startDate = new Date(selectedYear, 0, 1); // January 1st of the selected year
+    const endDate = new Date(selectedYear, 11, 31); // December 31st of the selected year
+
+    // Format the dates to match your database date format
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    {
+      if (error) 
+      {
+        //console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/:userId/yearly_report_of_one_user', async (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const selectedYear = req.query.year;
+    const records = await fetchUserYearlyTimesheetRecords(userId,selectedYear);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    //console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
+const fetchAllUserWeeklyTimesheetRecords = (selectedYear,selectedMonth,selectedWeek) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+    const startOfWeek = new Date(startDate);
+    startOfWeek.setDate(startOfWeek.getDate() + (selectedWeek - 1) * 7);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    const formattedStartOfWeek = startOfWeek.toISOString().split('T')[0];
+    const formattedEndOfWeek = endOfWeek.toISOString().split('T')[0];
+    const query = 'select * from timesheet WHERE fromdate >= ? AND fromdate <= ?';
+    const weekCondition = ' AND fromdate >= ? AND fromdate <= ?';
+    const fullQuery = selectedWeek
+      ? query + weekCondition
+      : query;
+    const queryParameters = selectedWeek
+      ? [formattedStartDate, formattedEndDate, formattedStartOfWeek, formattedEndOfWeek]
+      : [formattedStartDate, formattedEndDate];
+    db.query(fullQuery, queryParameters, (error, result) =>
+    {
+      if(error) 
+      {
+        //console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records=result.map((item)=>({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/all_user_weekly_records', async (req, res) => 
+{
+  try 
+  {
+    const selectedYear = req.query.year;
+    const selectedMonth = req.query.month;
+    const selectedWeek = req.query.week;
+    const records = await fetchAllUserWeeklyTimesheetRecords(selectedYear,selectedMonth,selectedWeek);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    //console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
+const fetchAllUserTimesheetRecords = (selectedYear,selectedMonth) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+    const query = 'select * from timesheet WHERE fromdate >= ? AND fromdate <= ?';
+    db.query(query,[formattedStartDate,formattedEndDate],(error,result)=> 
+    {
+      if(error) 
+      {
+        //console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records=result.map((item)=>({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/all_user_monthly_records', async (req, res) => 
+{
+  try 
+  {
+    const selectedYear = req.query.year;
+    const selectedMonth = req.query.month;
+    const records = await fetchAllUserTimesheetRecords(selectedYear,selectedMonth);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    //console.error('Error fetching or processing user records:', error);
+    res.status(500).json({ error: 'Error fetching or processing user records' });
+  }
+});
+
+const fetchAllUserTimesheetRecordsForYear = (selectedYear) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, 0, 1);
+    const endDate = new Date(selectedYear, 11, 31); 
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+    const query = 'select * from timesheet WHERE fromdate >= ? AND fromdate <= ?';
+    db.query(query,[formattedStartDate,formattedEndDate],(error,result)=> 
+    {
+      if(error) 
+      {
+        //console.error('Error fetching user timesheet records:', error);
+        reject(error);
+      } 
+      else 
+      {
+        const records=result.map((item)=>({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/home/user/all_user_yearly_records', async (req, res) => 
+{
+  try 
+  {
+    const selectedYear = req.query.year;
+    const records = await fetchAllUserTimesheetRecordsForYear(selectedYear);
+    const excelData = await createExcelFile(records);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+    res.end(excelData);
+  } 
+  catch(error) 
+  {
+    //console.error('Error fetching or processing user records:', error);
     res.status(500).json({ error: 'Error fetching or processing user records' });
   }
 });
@@ -601,6 +946,26 @@ app.post('/user_home/project',(req,res)=>
     });
 });
 
+app.post('/user_home/projectlist', (req, res) => 
+{
+  const { customerId } = req.body;
+  const query = 'SELECT name FROM project WHERE customer_id = ?';
+  db.query(query, [customerId], (err, results) => 
+  {
+      if(err) 
+      {
+          console.error('Error fetching projects:', err);
+          res.status(500).json({ error: 'Error fetching projects' });
+          return;
+      }
+      else
+      {
+        const projectNames = results.map(project => project.name);
+        res.json({ projects: projectNames });
+      }
+  });
+});
+
 app.post('/user_home/activity',(req,res)=> 
 {
     const query="select * from activity";
@@ -640,35 +1005,45 @@ app.post('/user_home/tag',(req,res)=>
 
 app.get('/user_home/userinfo', (req, res) => 
 {
-  if (req.session && req.session.user) 
+  if(req.session && req.session.user) 
   {
-    console.log("Log in true");
-    console.log(req.session.user);
     res.send({ loggedIn: true, user: req.session.user });
   } 
   else 
   {
-    console.log("Log in false");
-    console.log(req.session.user);
     res.send({ loggedIn: false });
   }
 });
 
 app.get('/user_home/userid', (req, res) => 
 {
-  if (req.session && req.session.user) 
+  if(req.session && req.session.user) 
   {
     const userId = req.session.user[0].user_id;
-    console.log("Log in true");
-    console.log(req.session.user);
-    console.log(userId);
+    req.session.userId = userId;
     res.json({loggedIn: true,userId});
   } 
   else 
   {
-    console.log("Log in false & User ID not found");
     res.send({ loggedIn: false });
   }
+});
+
+app.post('/user_home/save_tag',(req,res)=> 
+{
+    const{name}=req.body;
+    const sql='insert into tags(name)values(?)';
+    db.query(sql,[name],(err,result)=> 
+    {
+      if(err) 
+      {
+        res.status(500).json({error:'Error Saving Tag'});
+      } 
+      else 
+      {
+        res.status(200).json({message:'Tag Saved Successfully.'});
+      }
+    });
 });
 
 app.post('/user_home/timesheet',(req,res)=> 
@@ -692,32 +1067,397 @@ app.get('/home/userstatus', (req, res) =>
 {
   if (req.session && req.session.user) 
   {
-    //console.log("Log in true");
     res.send({ loggedIn: true });
   } 
   else 
   {
-    //console.log("Log in false");
     res.send({ loggedIn: false });
   }
 });
 
+const getRandomColor = () => 
+{
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) 
+  {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
 app.get('/home/timesheet_data', (req, res) => 
 {
   const user_id = 1;
-  const query = `SELECT duration FROM timesheet WHERE user_id = ?`;
-  db.query(query, [user_id], (err, duration) => 
+  const query = `SELECT fromdate,duration FROM timesheet WHERE user_id = ?`;
+  db.query(query, [user_id], (err, results) => 
   {
     if (err) 
     {
-      console.error('Error fetching timesheet data:', err);
       res.status(500).json({ error: 'Internal Server Error' });
     } 
     else 
     {
-      res.json(duration);
+      const durationData = results.map((entry) => ({
+        fromdate: new Date(entry.fromdate).toLocaleDateString(),
+        duration: entry.duration,
+        color: getRandomColor(),
+      }));
+      res.json(durationData);
     }
   });
+});
+
+app.get('/login/user_home/userid', (req, res) => 
+{
+  if (req.session && req.session.user) 
+  {
+    const userId = req.session.user[0].user_id;
+    res.json({loggedIn: true,userId});
+  } 
+  else 
+  {
+    res.send({ loggedIn: false });
+  }
+});
+
+app.get('/user_home/timesheet_data', (req, res) => 
+{
+    const userId = req.session.userId;
+    if(!userId) 
+    {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+    else
+    {
+      const query = `SELECT fromdate,duration FROM timesheet WHERE user_id = ?`;
+      db.query(query, [userId], (err, results) => 
+      {
+        if (err) 
+        {
+          res.status(500).json({ error: 'Internal Server Error' });
+        } 
+        else 
+        {
+          const durationData = results.map((entry) => ({
+            fromdate: new Date(entry.fromdate).toLocaleDateString(),
+            duration: entry.duration,
+            color: getRandomColor()
+          }));
+          res.json(durationData);
+        }
+      });
+    }
+});
+
+const fetchOneLoggedInUserTimesheetRecordsForYearMonthWeek = (userId, selectedYear, selectedMonth, selectedWeek) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+
+    const startOfWeek = new Date(startDate);
+    startOfWeek.setDate(startOfWeek.getDate() + (selectedWeek - 1) * 7);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+    const formattedStartOfWeek = startOfWeek.toISOString().split('T')[0];
+    const formattedEndOfWeek = endOfWeek.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+
+    const weekCondition = ' AND fromdate >= ? AND fromdate <= ?';
+    
+    const fullQuery = selectedWeek ? query + weekCondition : query;
+
+    const queryParameters = selectedWeek ? [userId, formattedStartDate, formattedEndDate, formattedStartOfWeek, formattedEndOfWeek] : [userId, formattedStartDate, formattedEndDate];
+
+    db.query(fullQuery, queryParameters, (error, result) =>
+    {
+      if(error) 
+      {
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/user_home/user/:userId/records', async (req, res) => 
+{
+  const userId = req.session.userId;
+  if(!userId) 
+  {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  else
+  {
+    try 
+    {
+      const userId = req.session.userId;
+      const selectedYear = req.query.year;
+      const selectedMonth = req.query.month;
+      const selectedWeek = req.query.week;
+      const records = await fetchOneLoggedInUserTimesheetRecordsForYearMonthWeek(userId,selectedYear,selectedMonth,selectedWeek);
+      const excelData = await createExcelFile(records);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+      res.end(excelData);
+    } 
+    catch(error) 
+    {
+      res.status(500).json({ error: 'Error fetching or processing user records' });
+    }
+  }
+});
+
+const fetchUserMonthlyTimesheetRecordsForLoggedInOneUser = (userId,selectedYear,selectedMonth) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+
+    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    {
+      if (error) 
+      {
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/user_home/user/:userId/one_user_monthly_records', async (req, res) => 
+{
+  const userId = req.session.userId;
+  if(!userId) 
+  {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  else
+  {
+    try 
+    {
+      const userId = req.session.userId;
+      const selectedYear = req.query.year;
+      const selectedMonth = req.query.month;
+      const records = await fetchUserMonthlyTimesheetRecordsForLoggedInOneUser(userId,selectedYear,selectedMonth);
+      const excelData = await createExcelFile(records);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+      res.end(excelData);
+    } 
+    catch(error) 
+    {
+      res.status(500).json({ error: 'Error fetching or processing user records' });
+    }
+  }
+});
+
+const fetchLoggedInUserYearlyTimesheetRecords = (userId, selectedYear) => 
+{
+  return new Promise((resolve, reject) => 
+  {
+    const startDate = new Date(selectedYear, 0, 1);
+    const endDate = new Date(selectedYear, 11, 31);
+
+    const formattedStartDate = startDate.toISOString().split('T')[0];
+    const formattedEndDate = endDate.toISOString().split('T')[0];
+  
+    const query = 'select * from timesheet WHERE user_id = ? AND fromdate >= ? AND fromdate <= ?';
+    db.query(query, [userId,formattedStartDate,formattedEndDate], (error, result) => 
+    {
+      if (error) 
+      {
+        reject(error);
+      } 
+      else 
+      {
+        const records = result.map((item) => ({
+          fromdate: item.fromdate,
+          fromtime: item.fromtime,
+          duration: item.duration,
+          endtime: item.endtime,
+          customer: item.customer,
+          projects: item.projects,
+          activity: item.activity,
+          description: item.description,
+          tag: item.tag
+        }));
+        resolve(records);
+      }
+    });
+  });
+};
+
+app.get('/user_home/user/:userId/yearly_report_of_one_user', async (req, res) => 
+{
+  const userId = req.session.userId;
+  if(!userId) 
+  {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  else
+  {
+    try 
+    {
+      const userId = req.session.userId;
+      const selectedYear = req.query.year;
+      const records = await fetchLoggedInUserYearlyTimesheetRecords(userId,selectedYear);
+      const excelData = await createExcelFile(records);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=user_timesheet_records.xlsx');
+      res.end(excelData);
+    } 
+    catch(error) 
+    {
+      res.status(500).json({ error: 'Error fetching or processing user records' });
+    }
+  }
+});
+
+app.get('/user_home/all_timesheet_data/:userId', (req, res) => 
+{
+  const userId = req.session.userId;
+  if(!userId) 
+  {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  else
+  {
+    const query = `SELECT * FROM timesheet WHERE user_id = ?`;
+    db.query(query, [userId], (err, results) => 
+    {
+      if (err) 
+      {
+        res.status(500).json({ error: 'Internal Server Error' });
+      } 
+      else 
+      {
+        res.json(results);
+      }
+    });
+  }
+});
+
+app.post('/user_home/update_timesheet/:userId/:recordId', (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const recordId = req.params.recordId;
+    const { fromdate, fromtime, endtime, duration, customer, projects, activity, description, tag } = req.body;
+    const updateUserTimesheetSqlData = "UPDATE timesheet SET fromdate = ?, fromtime = ?, endtime = ?, duration = ?, customer = ?, projects = ?, activity = ?, description = ?, tag = ? WHERE user_id = ? AND id = ?";
+    const updateTimesheetValues = [fromdate, fromtime, endtime, duration, customer, projects, activity, description, tag, userId, recordId];
+    db.query(updateUserTimesheetSqlData,updateTimesheetValues,(updateErr,updateResult)=> 
+    {
+      if(updateErr) 
+      {
+        return res.status(500).json({success: false, error:"Error updating timesheet"});
+      }
+      else
+      {
+        return res.status(200).json({ success: true, message: 'Timesheet updated successfully.' });
+        //io.emit('timesheetUpdated', { userId: req.params.userId, recordId: req.params.recordId });
+      }
+    });
+  } 
+  catch (error) 
+  {
+    res.status(500).json({ success: false, error: 'An error occurred while updating timesheet.' });
+  }
+});
+
+app.get('/user_home/user/:userId/project_records', async (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const query = `SELECT projects FROM timesheet WHERE user_id = ?`;
+    db.query(query, [userId], (err, results) => 
+    {
+      if(err) 
+      {
+        res.status(500).json({ error: 'Internal Server Error' });
+      } 
+      else 
+      {
+        res.json(results);
+      }
+    });
+  } 
+  catch(error) 
+  {
+    res.status(500).json({ error: 'Error fetching or processing user project records' });
+  }
+});
+
+app.get('/user_home/user/:userId/activity_records', async (req, res) => 
+{
+  try 
+  {
+    const userId = req.params.userId;
+    const query = `SELECT activity FROM timesheet WHERE user_id = ?`;
+    db.query(query, [userId], (err, results) => 
+    {
+      if(err) 
+      {
+        res.status(500).json({ error: 'Internal Server Error' });
+      } 
+      else 
+      {
+        res.json(results);
+      }
+    });
+  } 
+  catch(error) 
+  {
+    res.status(500).json({ error: 'Error fetching or processing user activity records' });
+  }
 });
 
 app.listen(8081,()=>
