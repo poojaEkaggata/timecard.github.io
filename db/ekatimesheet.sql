@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 19, 2024 at 08:30 AM
+-- Generation Time: Feb 09, 2024 at 02:41 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -64,7 +64,7 @@ CREATE TABLE `customer` (
 
 INSERT INTO `customer` (`id`, `customer_id`, `name`) VALUES
 (1, 1, 'Dassault'),
-(2, 2, 'Digital Marketing Project'),
+(2, 2, 'Digital Marketing'),
 (3, 3, 'Ekaggata Internal Delivery'),
 (4, 4, 'Mate4Tech'),
 (5, 5, 'Milkvilla'),
@@ -72,7 +72,7 @@ INSERT INTO `customer` (`id`, `customer_id`, `name`) VALUES
 (7, 7, 'MGD'),
 (8, 8, 'new'),
 (9, 9, 'new cust'),
-(10, 10, 'priya'),
+(10, 10, 'Priya'),
 (11, 11, 'newly');
 
 -- --------------------------------------------------------
@@ -92,13 +92,17 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`id`, `customer_id`, `name`) VALUES
-(1, 1, 'Dassault'),
+(1, 1, 'Dassault Project'),
 (2, 2, 'Digital Marketing Project'),
 (3, 3, 'Ekaggata Internal Project - IND'),
 (4, 4, 'Mate4Tech - IND'),
 (5, 5, 'Milkvilla - IND'),
 (6, 6, 'Joolkart - IND'),
-(7, 7, 'project name');
+(7, 7, 'MGD Project'),
+(8, 8, 'New Project'),
+(9, 9, 'New Cust Project'),
+(10, 10, 'Priya-Project'),
+(11, 11, 'Newly-Added-Project');
 
 -- --------------------------------------------------------
 
@@ -139,7 +143,10 @@ CREATE TABLE `tags` (
 INSERT INTO `tags` (`id`, `name`) VALUES
 (1, 'Work'),
 (2, 'Public Holiday'),
-(3, 'tag');
+(3, 'Optional Holiday'),
+(4, 'Comp Off'),
+(5, 'Sick Leave'),
+(6, 'Casual Leave');
 
 -- --------------------------------------------------------
 
@@ -177,13 +184,31 @@ INSERT INTO `timesheet` (`id`, `user_id`, `fromdate`, `fromtime`, `duration`, `e
 (7, 0, '2024-01-09', '04:00 PM', '02:00:00', '06:00 PM', 'Digital Marketing Project', '[\"Digital Marketing Project\"]', 'Casual Leave', 'b', 'Public Holiday', '2024-01-09 11:02:53', '2024-01-09 11:02:53'),
 (8, 0, '2024-01-09', '04:00 PM', '02:00:00', '06:00 PM', 'Digital Marketing Project', '[\"Digital Marketing Project\"]', 'Loss of Pay', 'jhb', 'Public Holiday', '2024-01-09 11:03:32', '2024-01-09 11:03:32'),
 (9, 2, '2024-01-09', '04:00 PM', '04:00:00', '08:00 PM', 'Dassault', '[\"Dassault\"]', 'Public Holiday', 'des', 'Work', '2024-01-09 11:19:07', '2024-01-09 11:19:07'),
-(10, 3, '2024-01-09', '06:00 PM', '01:30:00', '07:30 PM', 'Ekaggata Internal Delivery', '[\"Ekaggata Internal Project - IND\"]', 'Loss of Pay', 'd', 'Public Holiday', '2024-01-09 11:29:03', '2024-01-09 11:29:03'),
-(11, 3, '2024-01-09', '04:00 PM', '04:00:00', '08:00 PM', 'Ekaggata Internal Delivery', '[\"Ekaggata Internal Project - IND\"]', 'Earned Leave', 'description', 'Public Holiday', '2024-01-09 11:30:11', '2024-01-09 11:30:11'),
-(12, 3, '2024-01-12', '08:00 PM', '01:00:00', '09:00 PM', 'Ekaggata Internal Delivery', '[\"Ekaggata Internal Project - IND\"]', 'Public Holiday', 'd', 'Work', '2024-01-09 11:30:55', '2024-01-09 11:30:55'),
-(13, 3, '2024-01-25', '10:00 PM', '01:00:00', '11:00 PM', 'Dassault', '[\"Dassault\"]', 'Public Holiday', 'desc', 'Work', '2024-01-09 11:31:57', '2024-01-09 11:31:57'),
-(14, 3, '2024-01-30', '08:00 PM', '01:00:00', '09:00 PM', 'Joolkart', '[\"Joolkart - IND\"]', 'Project Work', 'Description', 'Public Holiday', '2024-01-09 11:57:14', '2024-01-09 11:57:14'),
-(15, 3, '2024-01-09', '05:00 PM', '05:00:00', '10:00 PM', 'Milkvilla', '[\"Milkvilla - IND\"]', 'Comp Off', 'desc', 'Work', '2024-01-09 11:57:45', '2024-01-09 11:57:45'),
-(16, 1, '2024-02-21', '01:00 PM', '02:00:00', '03:00 PM', 'Dassault', '[\"Dassault\"]', 'Comp Off', 'd', 'Public Holiday', '2024-01-19 05:49:33', '2024-01-19 05:49:33');
+(10, 3, '2024-01-16', '13:00', '06:00:00', '19:00', 'Priya', 'Priya-Project', 'Public Holiday', 'Description Test One', 'Public Holiday', '2024-02-08 07:14:15', '2024-02-08 07:14:15'),
+(11, 3, '2024-01-02', '08:00', '11:00:00', '19:00', 'Joolkart', 'Joolkart - IND', 'Casual Leave', 'Description Test Two', 'Casual Leave', '2024-02-08 07:04:46', '2024-02-08 07:04:46'),
+(12, 3, '2024-01-10', '06:00', '05:00:00', '11:00', 'MGD', 'MGD Project', 'Project Work', 'New Description', 'Work', '2024-02-08 07:04:11', '2024-02-08 07:04:11'),
+(13, 3, '2024-01-23', '06:00', '05:00:00', '11:00', 'Digital Marketing', 'Digital Marketing Project', 'Project Work', 'New Description', 'Work', '2024-02-08 07:04:37', '2024-02-08 07:04:37'),
+(14, 3, '2024-01-05', '06:00', '05:00:00', '11:00', 'Dassault', 'Dassault Project', 'Project Work', 'New Description', 'Work', '2024-02-08 07:04:00', '2024-02-08 07:04:00'),
+(15, 3, '2024-02-08', '16:30', '07:00:00', '23:30', 'Digital Marketing', 'Digital Marketing Project', 'Sick Leave', 'Description Test One', 'Sick Leave', '2024-02-08 07:04:58', '2024-02-08 07:04:58'),
+(16, 1, '2024-02-21', '01:00 PM', '02:00:00', '03:00 PM', 'Dassault', '[\"Dassault\"]', 'Comp Off', 'd', 'Public Holiday', '2024-01-19 05:49:33', '2024-01-19 05:49:33'),
+(17, 2, '2024-01-27', '12:00 PM', '04:00:00', '04:00 PM', 'Digital Marketing Project', '[\"Digital Marketing Project\"]', 'Project Work', 'Work', 'Work', '2024-01-27 06:39:50', '2024-01-27 06:39:50'),
+(18, 3, '2024-02-07', '16:00', '04:00:00', '20:00', 'Mate4Tech', 'Mate4Tech - IND', 'Project Work', 'desc', 'Work', '2024-02-08 07:09:04', '2024-02-08 07:09:04'),
+(19, 3, '2024-02-09', '19:00', '01:00:00', '20:00', 'MGD', 'MGD Project', 'Project Work', 'Description Testing', 'Work', '2024-02-08 07:09:13', '2024-02-08 07:09:13'),
+(20, 3, '2024-02-28', '10:00', '01:30:00', '11:30', 'Ekaggata Internal Delivery', 'Ekaggata Internal Project - IND', 'Project Work', 'Description Test', 'Work', '2024-02-08 07:09:26', '2024-02-08 07:09:26'),
+(21, 3, '2024-02-14', '11:00', '00:30:00', '11:30', 'Dassault', 'Dassault Project', 'Casual Leave', 'Description Text', 'Casual Leave', '2024-02-08 07:09:40', '2024-02-08 07:09:40'),
+(22, 3, '2024-01-21', '13:00', '09:00:00', '22:00', 'Digital Marketing', 'Digital Marketing Project', 'Project Work', 'Description', 'Work', '2024-02-08 07:10:05', '2024-02-08 07:10:05'),
+(23, 3, '2023-12-18', '14:00', '04:00:00', '18:00', 'MGD', 'MGD Project', 'Public Holiday', 'NA', 'Public Holiday', '2024-02-08 07:10:10', '2024-02-08 07:10:10'),
+(24, 3, '2023-11-01', '11:00', '00:30:00', '11:30', 'Dassault', 'Dassault Project', 'Project Work', 'Not Applicable', 'Work', '2024-02-08 07:10:15', '2024-02-08 07:10:15'),
+(25, 3, '2024-03-06', '12:00', '01:00:00', '13:00', 'Mate4Tech', 'Mate4Tech - IND', 'Loss of Pay', 'Description', 'Optional Holiday', '2024-02-08 07:10:21', '2024-02-08 07:10:21'),
+(26, 3, '2024-03-18', '13:00', '10:00:00', '23:00', 'Joolkart', 'Joolkart - IND', 'Earned Leave', 'NA', 'Optional Holiday', '2024-02-08 07:10:27', '2024-02-08 07:10:27'),
+(27, 3, '2024-02-26', '12:00', '01:00:00', '13:00', 'Dassault', 'Dassault Project', 'Public Holiday', 'description', 'Public Holiday', '2024-02-08 07:10:34', '2024-02-08 07:10:34'),
+(28, 3, '2023-06-19', '13:30', '04:00:00', '17:30', 'Priya', 'Priya-Project', 'Sick Leave', 'Leave', 'Sick Leave', '2024-02-08 07:14:28', '2024-02-08 07:14:28'),
+(29, 3, '2024-02-13', '13:00', '03:00:00', '16:00', 'Joolkart', 'Joolkart - IND', 'Project Work', 'description of the joolkart project work status', 'Work', '2024-02-08 07:10:56', '2024-02-08 07:10:56'),
+(30, 3, '2023-02-10', '16:00', '07:00:00', '23:00', 'Digital Marketing', 'Digital Marketing Project', 'Project Work', 'Description', 'Work', '2024-02-08 07:11:02', '2024-02-08 07:11:02'),
+(31, 3, '2024-02-19', '05:00 PM', '06:00:00', '11:00 PM', 'Milkvilla', 'Milkvilla - IND', 'Project Work', 'Description', 'Work', '2024-02-08 06:54:44', '2024-02-08 06:54:44'),
+(32, 3, '2024-02-25', '12:00 PM', '08:00:00', '08:00 PM', 'Priya', 'Priya-Project', 'Casual Leave', 'Description', 'Casual Leave', '2024-02-08 07:15:00', '2024-02-08 07:15:00'),
+(33, 3, '2024-02-08', '12:00 PM', '02:00:00', '02:00 PM', 'Priya', 'Priya-Project', 'Project Work', 'Description', 'Work', '2024-02-08 07:18:26', '2024-02-08 07:18:26'),
+(34, 3, '2024-02-20', '01:00 PM', '06:00:00', '07:00 PM', 'Priya', 'Priya-Project', 'Project Work', 'Description', 'Work', '2024-02-08 07:19:14', '2024-02-08 07:19:14');
 
 -- --------------------------------------------------------
 
@@ -301,7 +326,7 @@ ALTER TABLE `customer`
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -313,13 +338,13 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `timesheet`
 --
 ALTER TABLE `timesheet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `user`
