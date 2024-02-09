@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './css/AdminCSS.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Logo from '../src/images/eka_lgo-removebg-preview.png';
+import Logo from '../src/images/logo-ekaggata.jpg';
 
 const AdminSidebar = ({ handleMenuClick, handleNewSubMenuClick }) => 
 {

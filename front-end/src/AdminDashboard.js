@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/AdminCSS.css';
 import { Container, Row } from "react-bootstrap";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+//import { Rect, Svg } from 'react-native-svg';
 
 function AdminDashboard()
 {
@@ -60,12 +61,29 @@ function AdminDashboard()
   const formattedTotal = `${hours.toString().padStart(2, "0")} Hours : ${minutes.toString().padStart(2, "0")} Minutes : ${seconds.toString().padStart(2, "0")} Seconds`;
   //const totalWorkingHours = durationData.reduce((total, entry) => total + entry.duration, 0);
   //const totalWorkingHours = durationData.reduce((total, entry) => total + entry.hours, 0);
+
+  const renderCustomTooltip = (props) => 
+  {
+    const { payload } = props;
+  
+    if (payload && payload.length > 0) {
+      const duration = payload[0].value;
+  
+      return (
+        <div className="custom-tooltip">
+          <p>{`Duration: ${duration}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+  
   return (
    <>
     <Container>
       <Row style={{ textAlign: 'center', fontWeight: 'bold', marginLeft: '26px', marginTop: '30px' }}><h6><b>Admin Working Hours</b></h6></Row>
       <Row>
-        <ResponsiveContainer width="100%" height={400}>
+        {/* <ResponsiveContainer width="100%" height={400}>
           <BarChart data={durationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="label" />
@@ -73,6 +91,21 @@ function AdminDashboard()
             <Tooltip />
             <Legend />
             <Bar dataKey="duration" fill="rgba(33, 150, 243, 1)" />
+          </BarChart>
+        </ResponsiveContainer> */}
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={durationData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }} backgroundColor="#329DD3">
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="fromdate" />
+            <YAxis dataKey="duration" />
+            <Tooltip content={(props) => renderCustomTooltip(props)} />
+            <Legend />
+            {/* <Bar dataKey="duration" fill="rgba(33, 150, 243, 1)" /> */}
+            <Bar dataKey="duration" fill="#329DD3">
+              {durationData.map((entry, index) => (
+                <Bar key={`bar-${index}`} dataKey="duration" fill={entry.color} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </Row>

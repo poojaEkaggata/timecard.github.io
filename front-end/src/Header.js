@@ -3,10 +3,12 @@ import './css/Custom.css';
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSignOut } from '@fortawesome/free-solid-svg-icons';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Image } from 'react-bootstrap';
+import CreateTimeCardImage from '../src/images/document.png';
+import LogOut from '../src/images/logout.png';
 import axios from 'axios'; 
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faPlus, faSignOut } from '@fortawesome/free-solid-svg-icons';
 
 function Header({ selectedMenuItem, selectedSubMenuItem }) 
 {
@@ -95,22 +97,10 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
     generateEndTimeSlots();
   },[]);
 
-  /* const[errorMessage,setErrorMessage]=useState(''); */
-
   function handleEndTimeSelection(e)
   {
     setSelectedEndTime(e.target.value);
     calculateDuration(e.target.value,selectedStartTime);
-    /* //to check whether user enter appropriate end time or no
-    if(selectedEndTime<selectedStartTime) 
-    {
-      setErrorMessage('End time cannot be less than start time!');
-    } 
-    else 
-    {
-      setErrorMessage('');
-      calculateDuration(e.target.value, selectedStartTime);
-    } */
   };
 
   //Calculate Duration Time Period UI Functionality
@@ -146,31 +136,6 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
     {
       setDuration('');
     }
-    /* if (selectedStartTime && selectedEndTime) 
-    {
-      const startRegex = /(\d+):(\d+) ([AaPp][Mm])/;
-      const [, startHours, startMinutes] = selectedStartTime.match(startRegex);
-      const [, endHours, endMinutes, endPeriod] = selectedEndTime.match(startRegex);
-      const startHoursInt = parseInt(startHours, 10);
-      const startMinutesInt = parseInt(startMinutes, 10);
-      const endHoursInt = parseInt(endHours, 10);
-      const endMinutesInt = parseInt(endMinutes, 10);
-      const startTotalMinutes = startHoursInt * 60 + startMinutesInt;
-      let endTotalMinutes = endHoursInt * 60 + endMinutesInt;
-      if (endPeriod.toUpperCase() === 'AM' && startTotalMinutes > endTotalMinutes) 
-      {
-        endTotalMinutes += 24 * 60;
-      }
-      const durationInMinutes = endTotalMinutes - startTotalMinutes;
-      const hours = Math.floor(Math.abs(durationInMinutes) / 60).toString().padStart(2, '0');
-      const minutes = Math.abs(durationInMinutes) % 60;
-      const formattedDuration = `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-      setDuration(formattedDuration);
-    } 
-    else 
-    {
-      setDuration('');
-    } */
   };
 
   const[loading,setLoading]=useState(true);
@@ -266,7 +231,22 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
     {
       setSelectedCustomerName("MGD");
     }
-
+    if(selectedCustomerId==='8')
+    {
+      setSelectedCustomerName("new");
+    }
+    if(selectedCustomerId==='9')
+    {
+      setSelectedCustomerName("new cust");
+    }
+    if(selectedCustomerId==='10')
+    {
+      setSelectedCustomerName("Priya");
+    }
+    if(selectedCustomerId==='11')
+    {
+      setSelectedCustomerName("newly");
+    }
     const customerValue=e.target.value;
     if(customerValue!==0) 
     {
@@ -466,6 +446,20 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
     }
   };
 
+  // Define a state variable to track timesheet changes
+  const [timesheetUpdated, setTimesheetUpdated] = useState(false);
+
+  // Add useEffect hook to reload data when timesheet is updated
+  useEffect(() => 
+  {
+    if(timesheetUpdated) 
+    {
+      console.log('Reloading data after timesheet update');
+      setTimesheetUpdated(false);
+      window.location.reload();
+    }
+  },[timesheetUpdated]);
+
   const handleSubmit = async (e) =>
   {
     e.preventDefault();
@@ -477,15 +471,17 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
     {
       try 
       {
-        const stringifiedProjects=JSON.stringify(selectedProjectsValue);
+        //const stringifiedProjects=JSON.stringify(selectedProjectsValue);
+        const stringifiedProjects=selectedProjectsValue.join(', '); // Join selected projects with a comma
         axios.post('http://localhost:8081/user_home/timesheet',{userId,selectedFromDate,selectedStartTime,duration,selectedEndTime,newSelectedCustomerNameValue,stringifiedProjects,selectedActivityValue,description,selectedTagValue});
         handleClose();
+        setTimesheetUpdated(true);
         alert("Your Time Sheet has been created successfully.");
         navigate('/user_home');
       } 
       catch(error) 
       {
-        console.error('Error:',error);
+        setTimesheetUpdated(false);
         alert("Something went wrong!");
         navigate('/user_home');
       }
@@ -501,7 +497,7 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
             <div className="col col-4 col-lg-4 col-md-4 col-sm-4 col-xl-4 col-xxl-4 col-xs-4" style={{ display: 'flex', justifyContent: 'flex-start', marginLeft: 'auto' }}>
               {selectedMenuItem && (
               <div className="row mb-2">
-                <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>{selectedMenuItem}</p>
+                <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{selectedMenuItem}</p>
               </div>
               )}
               {(isSubMenuItem && !selectedMenuItem) && (
@@ -511,7 +507,7 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
               )}
               {!selectedMenuItem && !selectedSubMenuItem && (
                 <div className="row">
-                  <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>Dashboard</p>
+                  <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dashboard</p>
                 </div>
               )}
             </div>
@@ -528,11 +524,11 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
                     <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, {userData || 'Loading ....'}</p>
                   </>
               )}
-            <button className="btn btn-primary w-20 fw-bold text-center align-items-center" style={{ marginLeft: '20px', marginRight: '20px' }} onClick={handleShow} title='Click Here to Create Time Card'>
-              <FontAwesomeIcon icon={faPlus} /> Create Time Card
+            <button className="btn btn-primary w-20 fw-bold text-center align-items-center p-1" style={{ marginLeft: '20px', marginRight: '20px', backgroundColor: 'transparent', border: '0px' }} onClick={handleShow} title='Click Here to Create Time Card'>
+              <Image src={CreateTimeCardImage} alt="Create Time Card" title="Create Time Card" style={{ width: '40px', height: '40px' }}></Image>
             </button>
-            <button className="btn btn-danger w-20 fw-bold text-center align-items-center" onClick={NavigateBackToLogin} title='Click Here to Log Out'>
-              <FontAwesomeIcon icon={faSignOut} /> Log Out
+            <button className="btn btn-danger w-20 fw-bold text-center align-items-center p-1" onClick={NavigateBackToLogin} title='Click Here to Log Out' style={{ backgroundColor: 'transparent', border: '0px' }}>
+              <Image src={LogOut} alt="Log Out" title="Log Out" style={{ width: '40px', height: '40px' }}></Image>
             </button>
           </div>
           <Modal show={show} onHide={handleClose} className="d-flex justify-content-center align-items-center vh-100">
@@ -542,18 +538,6 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
               </Modal.Header>
               <Modal.Body>
               <div className="container">
-                {/* <div>
-                    {userInfo ? (
-                      <div>
-                        <h2>User Profile</h2>
-                        <p>USER ID: {userInfo.user_id}</p>
-                        <br />
-                        <p>USER NAME: {userInfo.name}</p>
-                      </div>
-                    ) : (
-                      <p>Loading...</p>
-                    )}
-                  </div> */}
                   <div className="mb-3">
                     <div className="d-flex">
                       <label htmlFor="fromdate" className="form-label w-100 me-2" style={{ width: '100vw' }}>
@@ -648,9 +632,7 @@ function Header({ selectedMenuItem, selectedSubMenuItem })
                       <label htmlFor="projects" className="form-label me-2" style={{ width: '100%' }}>
                         Project <span style={{ color: 'red' }}>*</span>
                       </label>
-                      <select type="dropdown" className="form-control me-0" id="projects" name="projects" style={{ width: '100vw' }} required
-                      //onChange={handleSecondSelectChange} 
-                      >
+                      <select type="dropdown" className="form-control me-0" id="projects" name="projects" style={{ width: '100vw' }} required>
                         {
                           showProjectSelect 
                           ?

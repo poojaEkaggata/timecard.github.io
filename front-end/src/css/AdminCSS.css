@@ -30,7 +30,7 @@
 }
 .sidebar 
 {
-    width: auto;
+    width: 242.33px;
     height: auto;
     background-color: #1f2e41;
     color: #fff;
@@ -108,8 +108,8 @@
   }
   .sidebar-header-image
   {
-    width: 80px;
-    height: 80px;
+    width: 200px;
+    height: 100px;
   }
   .sidebar-menu 
   {
@@ -244,4 +244,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.custom-tooltip 
+{
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #329DD3;
 }

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/AdminCSS.css';
+import UserDashboard from './User/UserDashboard.js';
+import UserReporting from './User/UserReporting/UserReporting.js';
+import UserMyTimes from './User/UserMyTimes.js';
+import UserWeeklyHours from './User/UserWeeklyHours.js';
+import UserCalendar from './User/UserCalendar.js';
 
 function MainEmployee({ selectedMenuItem, selectedSubMenuItem }) 
 {
@@ -10,7 +15,6 @@ function MainEmployee({ selectedMenuItem, selectedSubMenuItem })
 
   useEffect(() => 
   {
-    //console.log('Selected Menu Item in Main Employee:', selectedMenuItem);
     if (selectedMenuItem === currentMenu) 
     {
       setMenuKey(prevKey => prevKey + 1); 
@@ -23,7 +27,6 @@ function MainEmployee({ selectedMenuItem, selectedSubMenuItem })
 
   useEffect(() => 
   {
-    //console.log('Selected Sub Menu Item in Main Employee:', selectedSubMenuItem);
     if (selectedSubMenuItem) 
     {
       setCurrentMenu(null);
@@ -35,11 +38,11 @@ function MainEmployee({ selectedMenuItem, selectedSubMenuItem })
       switch (selectedMenuItem) 
       {
         case '':
-          return <div style={{ textAlign: 'center' }}>User Dashboard Content</div>;
+          return <UserDashboard />;
         case 'Dashboard':
-          return <div style={{ textAlign: 'center' }}>User Dashboard Content</div>;
+          return <UserDashboard />;
         case 'Reporting':
-          return <div style={{ textAlign: 'center' }}>User Reporting Content</div>;
+          return <UserReporting />;
         default:
           return getContentBySubMenu(selectedSubMenuItem);
       }
@@ -50,13 +53,13 @@ function MainEmployee({ selectedMenuItem, selectedSubMenuItem })
     switch (selectedSubMenuItem) 
     {
       case 'My Times':
-        return <div style={{ textAlign: 'center' }}>User My Times Content</div>;
+        return <UserMyTimes />;
       case 'Weekly Hours':
-        return <div style={{ textAlign: 'center' }}>User Weekly Hours Content</div>;
+        return <UserWeeklyHours />;
       case 'Calendar':
-        return <div style={{ textAlign: 'center' }}>User Calendar Content</div>;
+        return <UserCalendar />;
       default:
-        return <div style={{ textAlign: 'center' }}>User Dashboard Content</div>;
+        return <UserDashboard />;
     }
   }
 

@@ -5,7 +5,7 @@ const Footer = () =>
 {
   return (
   <div className="footer">
-    An Ekaggata Product By Pooja Dhamanekar @2023-2024
+    @ 2024 Ekaggata, All Rights Reserved.
   </div>
   );
 };

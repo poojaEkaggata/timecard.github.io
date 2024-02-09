@@ -2,11 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/AdminCSS.css';
-import { Modal, Button, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Row, Col, Image } from 'react-bootstrap';
 import axios from 'axios';
 import Validation from './LoginValidation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSignOut } from '@fortawesome/free-solid-svg-icons';
+import CreateTimeCardImage from '../src/images/document.png';
+import CreateUserImage from '../src/images/user.png';
+import LogOut from '../src/images/logout.png';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faPlus, faSignOut } from '@fortawesome/free-solid-svg-icons';
+// import socketIOClient from 'socket.io-client';
 
 const language = 
 [
@@ -399,8 +403,24 @@ function MyVerticallyCenteredModal(props)
   );
 }
 
+//const ENDPOINT = 'http://localhost:8081';
+
 function CreateUser({ selectedMenuItem, selectedSubMenuItem })
 {
+
+    /* useEffect(() => 
+    {
+      const socket = socketIOClient(ENDPOINT);
+      socket.on('timesheetUpdated', (data) => 
+      {
+        alert(`User ${data.userId} updated timesheet ${data.recordId}`);
+      });
+      return () => 
+      {
+        socket.disconnect();
+      };
+    },[]); */
+
     let navigate=useNavigate(); 
     function NavigateBackToLogin()
     { 
@@ -856,7 +876,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
               )} */}
               {selectedMenuItem && (
               <div className="row mb-2">
-                <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>{selectedMenuItem}</p>
+                <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{selectedMenuItem}</p>
               </div>
               )}
               {(isSubMenuItem && !selectedMenuItem) && (
@@ -866,7 +886,7 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
               )}
               {!selectedMenuItem && !selectedSubMenuItem && (
                 <div className="row">
-                  <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>Dashboard</p>
+                  <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center', alignContent: 'center' }}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dashboard</p>
                 </div>
               )}
             </div>
@@ -885,8 +905,9 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                     {/* <p className="mt-2" style={{ padding: '0px 0px 0px 0px', fontWeight: 'bold', alignItems: 'center' }}>Welcome, Admin</p>
                   </>
                 )} */}
-                <button className="btn btn-primary w-20 fw-bold text-center align-items-center mb-0" style={{ marginLeft: '20px', marginRight: '20px' }} onClick={handleShow} title='Click Here to Create Time Card'>
-                  <FontAwesomeIcon icon={faPlus} /> Create Time Card
+                <button className="btn btn-primary w-24 fw-bold text-center align-items-center mb-0 p-1" style={{ marginLeft: '20px', marginRight: '20px', backgroundColor: 'transparent', border: '0px' }} onClick={handleShow} title='Click Here to Create Time Card'>
+                  {/* <FontAwesomeIcon icon={faPlus} /> Create Time Card */}
+                  <Image src={CreateTimeCardImage} alt="Create Time Card" title="Create Time Card" style={{ width: '40px', height: '40px' }}></Image>
                 </button>
                 <Modal show={show} onHide={handleClose} className="d-flex justify-content-center align-items-center vh-100">
                   <form onSubmit={handleSubmit}> 
@@ -1082,12 +1103,14 @@ function CreateUser({ selectedMenuItem, selectedSubMenuItem })
                     </Modal.Footer>
                   </form>
                 </Modal>
-                <button className="btn btn-primary w-20 fw-bold text-center align-items-center mb-0" style={{ marginRight: '20px' }} onClick={()=>setModalShow(true)} title='Click Here to Create New User'>
-                  <FontAwesomeIcon icon={faPlus} /> Create User
+                <button className="btn btn-primary w-20 fw-bold text-center align-items-center mb-0 p-1" style={{ marginRight: '20px', backgroundColor: 'transparent', border: '0px' }} onClick={()=>setModalShow(true)} title='Click Here to Create New User'>
+                  {/* <FontAwesomeIcon icon={faPlus} /> Create User */}
+                  <Image src={CreateUserImage} alt="Create New User" title="Create New User" style={{ width: '40px', height: '40px' }}></Image>
                 </button>
                 <MyVerticallyCenteredModal show={modalShow} onHide={()=>setModalShow(false)} />
-                <button className="btn btn-danger w-20 fw-bold text-center align-items-center mb-0" onClick={NavigateBackToLogin} title='Click Here to Log Out'>
-                  <FontAwesomeIcon icon={faSignOut} /> Log Out
+                <button className="btn btn-danger w-20 fw-bold text-center align-items-center mb-0 p-1" onClick={NavigateBackToLogin} title='Click Here to Log Out' style={{ backgroundColor: 'transparent', border: '0px' }}>
+                  {/* <FontAwesomeIcon icon={faSignOut} /> Log Out */}
+                  <Image src={LogOut} alt="Log Out" title="Log Out" style={{ width: '40px', height: '40px' }}></Image>
                 </button>
             </div>
         </div>
